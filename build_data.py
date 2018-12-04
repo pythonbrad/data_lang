@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #buld_data by pythonbrad 28/04/2018
 import json
 import glob
@@ -15,9 +16,10 @@ for filename in glob.glob('*'+ext):
 	word_translate = []
 
 	for i in data:
-		d = i.split('.')
-		word_no_translate.append(d[0])
-		word_translate.append(d[1])
+		if i != '':
+			d = i.split('.')
+			word_no_translate.append(d[0])
+			word_translate.append(d[1])
 
 	data = {'lang':{},'mlang':{}}
 
