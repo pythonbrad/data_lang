@@ -12,26 +12,23 @@ for filename in glob.glob('*'+ext):
 	data = f.read()
 	f.close()
 	data = data.splitlines()
-	data2 = {"themes":{}}
-	theme_id = 0
-	theme_name = ""
-	theme = 0
-	nb_word = 0
+	word_no_translate = []
+	word_translate = []
+
 	for i in data:
-		if "[THEME]" in i:
-			theme = 1
-			theme_name = i.replace("[THEME]", "")
-			data2['themes'][theme_name] = {}
-		elif i != '':
+		if i != '':
 			d = i.split('.')
-			if (not theme_name or nb_word > 10) and not theme:
-				theme_name = "theme%s"%theme_id
-				data2['themes'][theme_name] = {}
-				theme_id += 1
-				nb_word = 0
-			data2['themes'][theme_name][d[0].capitalize()]=d[1].capitalize()
-			nb_word += 1
-	word[lang] = data2
+			word_no_translate.append(d[0])
+			word_translate.append(d[1])
+
+	data = {'lang':{},'mlang':{}}
+
+	for i in range(len(word_no_translate)):
+	    data['lang'][i]=word_no_translate[i].capitalize()
+	    data['mlang'][i]=word_translate[i].capitalize()
+
+	word[lang] = data
+	    
 f=open('word.json', 'w')
 json.dump(word, f)
 f.close()
