@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
-#buld_data by pythonbrad 28/04/2018
+# buld_data by pythonbrad 28/04/2018
 import json
 import glob
 
 _dict_word = {}
 ext = '.lang'
 
-for filename in glob.glob('*'+ext):
-	lang = filename.split('.')[0]
-	f=open(lang+ext, encoding='utf-8')
-	data = f.read()
-	f.close()
-	data = data.splitlines()
-	word_no_translate = []
-	word_translate = []
+for filename in glob.glob('*' + ext):
+    lang = filename.split('.')[0]
+    f = open(lang + ext, encoding='utf-8')
+    data = f.read()
+    f.close()
+    data = data.splitlines()
+    word_no_translate = []
+    word_translate = []
 
-	for i in data:
-		if i != '':
-			d = i.split('.')
-			word_no_translate.append(d[0])
-			word_translate.append(d[1])
+    for i in data:
+        if i != '':
+            d = i.split('.')
+            word_no_translate.append(d[0])
+            word_translate.append(d[1])
 
-	data = {'lang':{},'mlang':{}}
+    data = {'lang': {}, 'mlang': {}}
 
-	for i in range(len(word_no_translate)):
-	    data['lang'][i]=word_no_translate[i].capitalize()
-	    data['mlang'][i]=word_translate[i].capitalize()
+    for i in range(len(word_no_translate)):
+        data['lang'][i] = word_no_translate[i].capitalize()
+        data['mlang'][i] = word_translate[i].capitalize()
 
-	_dict_word[lang] = data
+    _dict_word[lang] = data
 
 # -*- coding: utf-8 -*-
 
-a="""*****L’ÉCOLE – LA CLASSE – L’INSTRUCTION
+a = """*****L’ÉCOLE – LA CLASSE – L’INSTRUCTION
 l’école
 la classe
 le devoir
@@ -4431,67 +4431,68 @@ FOUTOUNI
 """.split('\n')
 
 data = {}
-old_value = []
-old_title = []
+title = 'delete_me'
 
 for i in a:
-	if '*****' in i:
-		if old_title:
-			data[old_title] = old_value
-			old_title = []
-			old_value = []
-		old_title = i.replace('*****','')
-	else:
-		old_value.append(i)
+    if '*****' in i:
+        title = i.replace('*****', '').title()
+        data[title] = []
+    else:
+        data[title].append(i.capitalize())
+
 
 def exist(word):
-	result = {}
-	for lang in _dict_word:
-		for word_id in _dict_word[lang]['lang']:
-			if word.lower() == _dict_word[lang]['lang'][word_id].lower():
-				if not lang in result:
-					result[lang] = []
-				result[lang].append(word_id)
-	return result
+    result = {}
+    for lang in _dict_word:
+        for word_id in _dict_word[lang]['lang']:
+            if word.lower() == _dict_word[lang]['lang'][word_id].lower():
+                if lang not in result:
+                    result[lang] = []
+                result[lang].append(word_id)
+    return result
+
 
 dict_word = {}
 id_word_used = {}
 
 for theme in data:
-	for word in data[theme]:
-		_ = exist(word)
-		if _:
-			for lang in _:
-				if not lang in dict_word:
-					dict_word[lang] = {}
-				if not theme in dict_word[lang]:
-					dict_word[lang][theme] = {}
-				if not 'lang' in dict_word[lang][theme]:
-					dict_word[lang][theme]['lang'] = {}
-					dict_word[lang][theme]['mlang'] = {}
-				for i in _[lang]:
-					if not lang in id_word_used:
-						id_word_used[lang] = []
-					id_word_used[lang].append(i)
-					dict_word[lang][theme]['lang'][i] = _dict_word[lang]['lang'][i]
-					dict_word[lang][theme]['mlang'][i] = _dict_word[lang]['mlang'][i]
+    for word in data[theme]:
+        _ = exist(word)
+        if _:
+            for lang in _:
+                if lang not in dict_word:
+                    dict_word[lang] = {}
+                if theme not in dict_word[lang]:
+                    dict_word[lang][theme] = {}
+                if 'lang' not in dict_word[lang][theme]:
+                    dict_word[lang][theme]['lang'] = {}
+                    dict_word[lang][theme]['mlang'] = {}
+                for i in _[lang]:
+                    if lang not in id_word_used:
+                        id_word_used[lang] = []
+                    id_word_used[lang].append(i)
+                    dict_word[lang][theme]['lang'][i] = _dict_word[lang][
+                        'lang'][i]
+                    dict_word[lang][theme]['mlang'][i] = _dict_word[lang][
+                        'mlang'][i]
 
 for lang in _dict_word:
-	for id_word in _dict_word[lang]['lang']:
-		if lang in id_word_used:
-			if not id_word in id_word_used[lang]:
-				if not 'Other theme' in dict_word[lang]:
-					dict_word[lang]['Other theme'] = {'lang':{},'mlang':{}}
-				dict_word[lang]['Other theme']['lang'][id_word] = _dict_word[lang]['lang'][id_word]
-				dict_word[lang]['Other theme']['mlang'][id_word] = _dict_word[lang]['mlang'][id_word]
+    for id_word in _dict_word[lang]['lang']:
+        if lang in id_word_used:
+            if id_word not in id_word_used[lang]:
+                if 'Other theme' not in dict_word[lang]:
+                    dict_word[lang]['Other theme'] = {'lang': {}, 'mlang': {}}
+                dict_word[lang]['Other theme']['lang'][id_word] = _dict_word[
+                    lang]['lang'][id_word]
+                dict_word[lang]['Other theme']['mlang'][id_word] = _dict_word[
+                    lang]['mlang'][id_word]
 
-
-f=open('word.json', 'w')
+f = open('word.json', 'w')
 json.dump(dict_word, f)
 f.close()
 
-f=open('word.py', 'w', encoding='utf-8')
+f = open('word.py', 'w', encoding='utf-8')
 f.write("""# -*- coding: utf-8 -*-
 dict_word = %s
-"""%str(dict_word))
+""" % str(dict_word))
 f.close()
